@@ -1,0 +1,98 @@
+/* =========================================================
+ * jQuery.Bootstrap.Modal.Confirmations.js
+ * Repo: https://github.com/landscapeInstitute/jQueryBootstrapModalConfirmations
+ * Author: Louis Varley
+ * =========================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ========================================================= */
+
+jQuery.fn.confirmationModal = function(options){
+	
+	this.options = jQuery.extend({
+		title: "Confirm this action",
+		text: "Are you sure you want to perform this action?",
+		btnconfirm: "Confirm",
+		btncancel: "Cancel",
+	}, options );
+	
+	this.plugin =  {	
+		init: function (element) {
+			
+			this.element = element;
+
+			jQuery(this.element).click({plugin: this}, function(e, options){
+				
+				if(!jQuery(e.data.plugin.element).data('confirmed')){
+					
+					e.preventDefault();
+					
+					for (var k in e.data.plugin.options){
+
+						if(jQuery(e.data.plugin.element).data('confirmation-' + k) !== undefined){
+							e.data.plugin.options[k] = jQuery(e.data.plugin.element).data('confirmation-' + k);
+						}
+						
+					}
+
+					modal = jQuery(`<
+						<div class="modal fade" id="confirmation-modal" tabindex="-1" role="dialog" aria-labelledby="confirmation-modal" aria-hidden="true">
+						  <div class="modal-dialog" role="document">
+							<div class="modal-content">
+							  <div class="modal-header">
+								<h5 class="modal-title" id="confirmation-modal">` + e.data.plugin.options['title'] + `</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								  <span aria-hidden="true">&times;</span>
+								</button>
+							  </div>
+							  <div class="modal-body">
+								` + e.data.plugin.options['text'] + `
+							  </div>
+							  <div class="modal-footer">
+								<button type="button" class="btn-cancelled btn btn-secondary" data-dismiss="modal">` + e.data.plugin.options['btncancel'] + `</button>
+								<button type="button" class="btn-confirmed btn btn-primary">` + e.data.plugin.options['btnconfirm'] + `</button>
+							  </div>
+							</div>
+						  </div>
+						</div>
+					`);
+					
+					jQuery("body").append(modal);
+					jQuery('#confirmation-modal').modal(options)
+					
+					jQuery('#confirmation-modal').on('hidden.bs.modal', function (e) {
+					  jQuery(modal).remove();
+					})
+					
+					jQuery('.btn-confirmed').click({plugin: e.data.plugin},function(e){
+						jQuery(e.data.plugin.element).data('confirmed',true); 
+						jQuery(e.data.plugin.element).trigger('click');
+					});
+			
+				}else{
+					
+					if(jQuery(e.data.plugin.element).attr('href') != undefined) { 					
+						window.location.replace(jQuery(e.data.plugin.element).attr('href'))
+					}
+
+				}
+
+			});
+			
+		}
+	}
+	
+	this.plugin.options = this.options;
+	this.plugin.init(this);
+    return this.plugin;
+	
+}

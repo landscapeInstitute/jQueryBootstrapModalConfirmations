@@ -20,7 +20,13 @@ jQuery(element).confirmationModal({
 	btncancel: 'Cancel',
 });
 
-*/
+/* Apply to all with class */
+
+jQuery(document).ready(function(){
+	jQuery('.confirm-action').each(function(i, elem){
+		jQuery(elem).confirmationModal();
+	})
+});
 
 ```
 
